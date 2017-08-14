@@ -29,6 +29,19 @@ class SnapshotParser {
         }
         return object
     }
+    
+    func parseAsList<T:ParsableSnapshot>(snap:DataSnapshot, type:T.Type) throws -> Array<T> {
+        var list=[T]()
+        if let value = snap.value as? [String: Any] {
+            list=try parseList(list: value)
+        }
+        return list
+    }
+    
+    
+    
+    
+    
 
     private func parseNode<T:ParsableSnapshot>(id: String, node: [String: Any]) throws -> T {
         let object = T()
@@ -169,6 +182,25 @@ class SnapshotParser {
                 self.error = ParseError.bindingFailed("unable to bind the dictionary named: \(name)")
             }
         }
+    }
+    
+    class List<T:ParsableSnapshot>:ParsableSnapshot {
+        var id: String?=nil
+        var list:[T]?=nil
+        
+        required init(){}
+        
+        func bindProperties(binder: SnapshotParser.Binder) {
+            binder.bindList(name: "list", list: &list)
+        }
+        
+        func getList()->Array<T>?{
+            return list
+        }
+        
+        
+        
+        
     }
 
     enum ParseError: Error {
