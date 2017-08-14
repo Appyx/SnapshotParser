@@ -36,8 +36,10 @@ The parser knows five types to interpret the json format from Firebase:
     class Main{
         
         func run(){
-            //parse into an Example.swift
+            //parse single object into an Example
             let exampleObject = try SnapshotParser().parse(snap: getSnapshot(),type: Example.self)
+            //parse list of objects into an Array<Example>
+            let exampleObjects = try SnapshotParser().parseAsList(snap: getSnapshot(),type: Example.self)
         }
     }
 
