@@ -183,21 +183,6 @@ class SnapshotParser {
         }
     }
 
-    class List<T:ParsableSnapshot>: ParsableSnapshot {
-        var id: String? = nil
-        var list: [T]? = nil
-
-        required init() { }
-
-        func bindProperties(binder: SnapshotParser.Binder) {
-            binder.bindList(name: "list", list: &list)
-        }
-
-        func getList() -> Array<T>? {
-            return list
-        }
-    }
-
     enum ParseError: Error {
         case bindingFailed(String)
     }
