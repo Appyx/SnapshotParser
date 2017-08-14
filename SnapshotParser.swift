@@ -29,19 +29,18 @@ class SnapshotParser {
         }
         return object
     }
-    
-    func parseAsList<T:ParsableSnapshot>(snap:DataSnapshot, type:T.Type) throws -> Array<T> {
-        var list=[T]()
+
+    /// Parses the firebase-snapshot and returns a list of objects of the specified type.
+    /// The fields/objects/lists can be bound in the method:
+    ///
+    /// bindProperties(binder: SnapshotParser.Binder)
+    func parseAsList<T:ParsableSnapshot>(snap: DataSnapshot, type: T.Type) throws -> Array<T> {
+        var list = [T]()
         if let value = snap.value as? [String: Any] {
-            list=try parseList(list: value)
+            list = try parseList(list: value)
         }
         return list
     }
-    
-    
-    
-    
-    
 
     private func parseNode<T:ParsableSnapshot>(id: String, node: [String: Any]) throws -> T {
         let object = T()
@@ -171,42 +170,37 @@ class SnapshotParser {
         /// if the name of the key is not known in advance.
         ///
         /// This method throws an exception if different types are used for key-value-pairs.
-        func bindDictionary<K, V>(name:String, dict: inout [K: V]?) {
-            if let value = value as? V, let key = key as? K{
-                if(dict==nil){
-                    dict=[K:V]()
+        func bindDictionary<K, V>(name: String, dict: inout [K: V]?) {
+            if let value = value as? V, let key = key as? K {
+                if(dict == nil) {
+                    dict = [K: V]()
                 }
                 dict?.updateValue(value, forKey: key)
-                isBound=true
-            }else{
+                isBound = true
+            } else {
                 self.error = ParseError.bindingFailed("unable to bind the dictionary named: \(name)")
             }
         }
     }
-    
-    class List<T:ParsableSnapshot>:ParsableSnapshot {
-        var id: String?=nil
-        var list:[T]?=nil
-        
-        required init(){}
-        
+
+    class List<T:ParsableSnapshot>: ParsableSnapshot {
+        var id: String? = nil
+        var list: [T]? = nil
+
+        required init() { }
+
         func bindProperties(binder: SnapshotParser.Binder) {
             binder.bindList(name: "list", list: &list)
         }
-        
-        func getList()->Array<T>?{
+
+        func getList() -> Array<T>? {
             return list
         }
-        
-        
-        
-        
     }
 
     enum ParseError: Error {
         case bindingFailed(String)
     }
-
 }
 
 /// Used for parsing a snapshot into an swift object.
