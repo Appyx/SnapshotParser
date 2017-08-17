@@ -1,5 +1,7 @@
 # SnapshotParser
-Parser for gson-like parsing of Firebase-Snapshot responses in Swift.
+Parser for gson-like parsing/serializing of Firebase-Snapshot-responses in Swift 4.
+
+> (Note: This class is designed for Swift 4 and the Firebase SDK v4.0.0+)
 
 
 With this Parser you can automatically fill swift objects from your Firebase-Snapshots.
@@ -58,6 +60,8 @@ The following example is a Snapshot with the key ``-KlkSDA48adWgf4cSAe4"``:
 				}
 			}
 ```
+
+---
 
 The following code demonstrates all use cases (the code is not linked to the json above):
 
