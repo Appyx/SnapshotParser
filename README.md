@@ -65,9 +65,9 @@ The following code demonstrates all use cases (the code is not linked to the jso
     class Main{
         
         func run(){
-            //parse single object into an Example
+            //parse single snapshot into an Example
             let exampleObject = try SnapshotParser().parse(snap: getSnapshot(),type: Example.self)
-            //parse list of objects into an Array<Example>
+            //parse list of snapshots into an Array<Example>
             let exampleObjects = try SnapshotParser().parseAsList(snap: getSnapshot(),type: Example.self)
             //you can also serialize the created objects again
             let dict=SnapshotParser().serialize(object: exampleObject)
