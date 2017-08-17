@@ -9,19 +9,8 @@ If the id is not needed you can just implement the ```ParsableObject``` instead 
 
 The parser guarantees that you typed every name correctly by throwing an exception if a key is typed wrong :)
 
-
-
-The parser knows five types to interpret the json format from Firebase:
-
-* Snapshot - contains a key and one or more objects ``` "key":{"something":"primitiveValue",...},.. ```
-* Field - just a primitive ``` "something":"primitiveValue" ``` entry
-* Object - a snapshot without key ``` "metadata":{"something":"primitiveValue"} ``` (key "metadata" is ignored)
-* List - a list of snapshots ``` "key1":{"something":"primitiveValue"},"key2":{"something":"primitiveValue"} ```
-* Dictionary - instead of mapping values to class members they are mapped into a dictionary
-
-
-
-
+It is also possible to serialize the objects back into a dictionary, which can be used to update database values.
+During the serialisation process the keys of the snapshots are mapped back out of the class.
 
 # Installation
 * Just download the swift file and integrate it into the project.
@@ -29,17 +18,62 @@ The parser knows five types to interpret the json format from Firebase:
 * Nest as much as you want
 * Have fun with the clean API
 
-
-
 # Usage
 
-    class Main{
+The parser knows five types to interpret the json format from Firebase:
+
+* Snapshot - contains a key and one json-object
+* Field - just a primitive field
+* Object - a snapshot without key
+* List - a list of snapshots
+* Dictionary - instead of mapping values to class members they are mapped into a dictionary
+
+The following example is a Snapshot with the key ``-KlkSDA48adWgf4cSAe4"``:
+
+```javascript
+"-KlkSDA48adWgf4cSAe4": {
+			"name": "name",
+			"field1": 10,
+			"field2": 7,
+			"field3": 23,
+			"object":{
+				"fieldA":true,
+				"fieldB":"text"
+			},
+			"list": {
+				"-KrD41dNnkdq46k6fDPb": {
+					"fieldX": 0,
+					"fieldY": "some text",
+					"FieldZ": true
+				},
+				"Oklde47E5d4-OghJkl4A": {
+					"fieldX": 0,
+					"fieldY": "some text",
+					"FieldZ": true
+				},
+				"-KdjDiEjda4875EdsakD": {
+					"fieldX": 0,
+					"fieldY": "some text",
+					"FieldZ": true
+				}
+			}
+```
+
+The following code demonstrates all use cases (the code is not linked to the json above):
+
+```swift
+    class Main{
         
         func run(){
             //parse single object into an Example
             let exampleObject = try SnapshotParser().parse(snap: getSnapshot(),type: Example.self)
             //parse list of objects into an Array<Example>
             let exampleObjects = try SnapshotParser().parseAsList(snap: getSnapshot(),type: Example.self)
+            //you can also serialize the created objects again
+            let dict=SnapshotParser().serialize(object: exampleObject)
+            //to change the key name (which is "id" by default) you can create the parser with a custom key
+            //but this is not necessary in most cases
+            let parser=SnapshotParser(withKey: "yourPrimaryKey") 
         }
     }
 
@@ -90,7 +124,7 @@ The parser knows five types to interpret the json format from Firebase:
         func bindProperties(binder: SnapshotParser.Binder) {
             //...
         }
-    }
-
+    }
+```
 
 If you have questions feel free to open an issue ;)
