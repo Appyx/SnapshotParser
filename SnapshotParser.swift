@@ -31,10 +31,18 @@ class SnapshotParser {
     /// The fields/objects/lists can be bound in the method:
     ///
     /// bindProperties(binder: SnapshotParser.Binder)
-    func parse<T: ParsableSnapshot>(snap: DataSnapshot, type: T.Type) throws -> T {
+    func parseSnapshot<T: ParsableSnapshot>(snap: DataSnapshot, type: T.Type) throws -> T {
         let object = T()
         if let node = snap.value as? [String: Any] {
             return try parseNode(id: snap.key, node: node)
+        }
+        return object
+    }
+
+    func parseObject<T: ParsableObject>(snap: DataSnapshot, type: T.Type) throws -> T {
+        let object = T()
+        if let node = snap.value as? [String: Any] {
+            return try parseObject(node: node)
         }
         return object
     }
@@ -61,14 +69,15 @@ class SnapshotParser {
 
     private func parseNode<T: ParsableSnapshot>(id: String, node: [String: Any]) throws -> T {
         let object = T()
-        var binder = Binder(key: primaryKey, value: id)
+        let binder = Binder(key: primaryKey, value: id)
         object.bindProperties(binder: binder)
         try binder.checkForError()
-
-        for (key, value) in node {
-            binder = Binder(key: key, value: value)
-            object.bindProperties(binder: binder)
-            try binder.checkForError()
+        if let node = node as? [String: Any] {
+            for (key, value) in node {
+                let binder = Binder(key: key, value: value)
+                object.bindProperties(binder: binder)
+                try binder.checkForError()
+            }
         }
         return object
     }
@@ -221,11 +230,12 @@ class SnapshotParser {
             }
         }
 
-        /// Binds values and keys into a ordinary dictionary.
+        /// Binds all previously unbinded values and their keys into a dictionary.
+        /// This method can be used as a fallback mechanism if some values were not bound.
         /// This is useful if there are keys in the snapshot which are generated hash codes for example or
         /// if the name of the key is not known in advance.
         ///
-        /// This method throws an exception if wrong types are used for key-value-pairs.
+        /// This method throws an exception if different types are used for key-value-pairs.
         func bindDictionary<K, V>(name: String, dict: inout [K: V]?) {
             if (serialize) {
                 for (k, v) in dict! {
@@ -233,9 +243,11 @@ class SnapshotParser {
                 }
                 return
             }
-
-            if key == name, let value = value as? [K: V] {
-                dict = value
+            if let value = value as? V, let key = key as? K {
+                if (dict == nil) {
+                    dict = [K: V]()
+                }
+                dict?.updateValue(value, forKey: key)
                 isBound = true
             } else {
                 self.error = ParseError.bindingFailed("unable to bind the dictionary named: \(name)")
