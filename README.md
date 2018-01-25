@@ -70,7 +70,7 @@ The following code demonstrates all use cases (the code is not linked to the jso
         
         func run(){
             //parse single snapshot into an Example
-            let exampleObject = try SnapshotParser().parse(snap: getSnapshot(),type: Example.self)
+            let exampleObject = try SnapshotParser().parseSnapshot(snap: getSnapshot(),type: Example.self)
             //parse list of snapshots into an Array<Example>
             let exampleObjects = try SnapshotParser().parseAsList(snap: getSnapshot(),type: Example.self)
             //you can also serialize the created objects again
