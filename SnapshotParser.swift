@@ -72,12 +72,11 @@ class SnapshotParser {
         let binder = Binder(key: primaryKey, value: id)
         object.bindProperties(binder: binder)
         try binder.checkForError()
-        if let node = node as? [String: Any] {
-            for (key, value) in node {
-                let binder = Binder(key: key, value: value)
-                object.bindProperties(binder: binder)
-                try binder.checkForError()
-            }
+
+        for (key, value) in node {
+            let binder = Binder(key: key, value: value)
+            object.bindProperties(binder: binder)
+            try binder.checkForError()
         }
         return object
     }
